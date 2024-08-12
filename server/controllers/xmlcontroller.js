@@ -16,6 +16,7 @@ function createNestedStructure(urls,initialLoc) {
 
   const root = {
     url: urlwithoutTrailingslash,
+    data:null,
     location: initialLoc,
     lastmodified: null,
     changefrequency: null,
