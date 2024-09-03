@@ -1,0 +1,9 @@
+{
+	"id": "Gd9ttcv6aQKa5PB",
+	"json": "{\"id\":\"Gd9ttcv6aQKa5PB\",\"url\":\"https://jsonplaceholder.typicode.com\",\"uniqueKey\":\"https://jsonplaceholder.typicode.com\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{}}",
+	"method": "GET",
+	"orderNo": 1724377715673,
+	"retryCount": 0,
+	"uniqueKey": "https://jsonplaceholder.typicode.com",
+	"url": "https://jsonplaceholder.typicode.com"
+}

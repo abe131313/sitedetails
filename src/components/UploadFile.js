@@ -3,23 +3,23 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const UploadXML = () => {
-    const [file, setFile] = useState(null);
-    const [message, setMessage] = useState('');
+    const [file, setFile] = useState(null); // Hook to store the file
+    const [message, setMessage] = useState(''); // To store the message 
 
     const handleFileChange = (event) => {
-        setFile(event.target.files[0]);
+        setFile(event.target.files[0]); //to handle file change
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event) => { // Function to handle submit 
         event.preventDefault();
         if (!file) {
-            setMessage('Please select an XML file first.');
-            return;
+            setMessage('Please select an XML file first.'); // If the xml file is not selected for upload then this message pops up
+            return; // returning the statement
         }
 
-        const reader = new FileReader();
+        const reader = new FileReader(); // Using the native fileReader function to read the files
         reader.onload = async () => {
-            const xmlData = reader.result;
+            const xmlData = reader.result; 
 
             try {
                 const response = await axios.post('http://localhost:5000/xml/upload', { xmlData }, {
@@ -34,7 +34,7 @@ const UploadXML = () => {
             }
         };
 
-        reader.readAsText(file);
+        reader.readAsText(file); 
     };
 
     return (
