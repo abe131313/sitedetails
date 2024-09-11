@@ -14,6 +14,10 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
+In the project's server directory, you can run:
+### npm run build
+This runs the server in the development mode using nodemon to listen for any changes.
+
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.\
