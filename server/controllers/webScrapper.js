@@ -6,7 +6,8 @@ const cheerio = require("cheerio"); // Library for server-side jQuery-like HTML 
 const axios = require("axios"); // Library for making HTTP requests
 const { PuppeteerCrawler, Dataset } = require('crawlee'); // Crawlee modules for web scraping
 const { parse } = require('node-html-parser'); // Library to parse HTML content into a DOM structure
-const dataScrapModel = require('../models/dataScrapModel.js')
+const dataScrapModel = require('../models/dataScrapModel.js');
+require("dotenv").config();
 
 // Function to scrape the textual data of a website using an external API
 async function scrapeData(url) {
@@ -15,7 +16,7 @@ async function scrapeData(url) {
       "https://api.scraptio.com/scrape",
       {
         url: url, // URL to scrape
-        api_key: "MrnJ7uSbbCXbbKTlQOnKqx8mHMxnhS2s1wzWySaBSuRm55gTFLZJpSoQXq1GtFsx", // API key for authentication
+        api_key: `${process.env.SCRAPTIO_APIKEY}`, // API key for authentication
       },
       {
         headers: {
