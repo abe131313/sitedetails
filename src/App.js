@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useState, useRef, useEffect } from "react";
 import SearchBar from "./components/SearchBar";
 import ChatEnvironment from "./components/ChatEnvironment";
+import LoggedInChatInterface from './components/LoggedInChatInterface.js'
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import {
   BrowserRouter as Router,
@@ -132,6 +133,10 @@ function App() {
             <Route
               path="/login" // Note that the path is all lowercase.
               element={<LoginPage darkMode={darkMode} />}
+            />
+            <Route
+              path="/loggedInChat" // Note that the path is all lowercase.
+              element={<LoggedInChatInterface darkMode={darkMode} />}
             />
           </Routes>
         </div>

@@ -10,26 +10,39 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import TypewriterText from "./TypeWritter";
+import CustomizedSnackbar from "./SnackBar";
 import axios from "axios";
 
 function LoginPage({ onLogin, darkMode }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+  // const [success, setSuccess] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post("http://localhost:5000/login", {
         username,
         password,
       });
+      // setSuccess("login successfull.");
+      setMessage("login successful!");
+      setSeverity("success");
+      setOpen(true);
       // Assuming the backend returns a user object and a token
       const { user, token } = response.data;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", user.username);
       localStorage.setItem("token", token);
-      onLogin(user);
+      // onLogin(user);
     } catch (err) {
       setError("Invalid username or password");
+      // setSuccess("login unsuccessfull.");
+      setMessage("login unsuccessful, Please try again with correct details");
+      setSeverity("warning");
+      setOpen(true);
     }
   };
 
@@ -81,11 +94,6 @@ function LoginPage({ onLogin, darkMode }) {
           variant="h5" // Optional: change typography variant
           // color="primary" // Optional: change text color
         />
-        {error && (
-          <Typography color="error" textAlign="center">
-            {error}
-          </Typography>
-        )}
         <TextField
           label="Username"
           variant="outlined"
@@ -154,6 +162,14 @@ function LoginPage({ onLogin, darkMode }) {
         >
           Login
         </Button>
+        {message.length > 0 ? (
+          <CustomizedSnackbar
+            open={open}
+            setOpen={setOpen}
+            message={message}
+            severity={severity}
+          />
+        ) : null}
       </Box>
     </Box>
   );
