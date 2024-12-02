@@ -1,12 +1,22 @@
-import './App.css';
-import React, { useState, useRef, useEffect } from 'react';
-import SearchBar from './components/SearchBar';
-import ChatEnvironment from './components/ChatEnvironment';
+import "./App.css";
+import React, { useState, useRef, useEffect } from "react";
+import SearchBar from "./components/SearchBar";
+import ChatEnvironment from "./components/ChatEnvironment";
 import { createTheme, ThemeProvider, CssBaseline } from "@mui/material";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import LoginPage from "./components/LoginPage.js";
+import SignupPage from "./components/signUpPage.js";
 import Navbar from "./components/Navbar.js";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [darkMode, setDarkMode] = useState(false); // State to track dark/light mode
   const chatRef = useRef(null); // Reference to the ChatEnvironment for scrolling
@@ -29,8 +39,8 @@ function App() {
     if (showChat && chatRef.current) {
       setTimeout(() => {
         chatRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
+          behavior: "smooth",
+          block: "start",
         });
       }, 200); // Adding a delay of 200ms to ensure the component is rendered
     }
@@ -53,31 +63,79 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Apply global styles for light/dark mode */}
-      <div className="App" style={{ height: "100vh" }}>
-        {/* Navbar will always be visible */}
-        <Navbar
-          darkMode={darkMode}
-          onThemeChange={handleThemeChange}
-          showBackButton={showChat}
-          onBack={handleBack}
-        />
-        {!showChat ? (
-          <SearchBar
-            onSearch={handleSearch}
-            darkMode={darkMode}
-            onThemeChange={handleThemeChange}
-          />
-        ) : (
-          <div ref={chatRef}>
-            <ChatEnvironment
-              searchQuery={searchQuery}
-              onBack={handleBack}
+      <Router>
+        <div className="App" style={{ height: "100vh" }}>
+          {/* Navbar will always be visible */}
+          {/* <Navbar
               darkMode={darkMode}
               onThemeChange={handleThemeChange}
+              showBackButton={showChat}
+              onBack={handleBack}
             />
-          </div>
-        )}
-      </div>
+            {!showChat ? (
+              <SearchBar
+                onSearch={handleSearch}
+                darkMode={darkMode}
+                onThemeChange={handleThemeChange}
+              />
+            ) : (
+              <div ref={chatRef}>
+                <ChatEnvironment
+                  searchQuery={searchQuery}
+                  onBack={handleBack}
+                  darkMode={darkMode}
+                  onThemeChange={handleThemeChange}
+                />
+              </div>
+            )} */}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Navbar
+                    darkMode={darkMode}
+                    onThemeChange={handleThemeChange}
+                    showBackButton={showChat}
+                    onBack={handleBack}
+                  />
+                  <SearchBar
+                    onSearch={handleSearch}
+                    darkMode={darkMode}
+                    onThemeChange={handleThemeChange}
+                  />
+                </>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <>
+                  <Navbar
+                    darkMode={darkMode}
+                    onThemeChange={handleThemeChange}
+                    showBackButton={showChat}
+                    onBack={handleBack}
+                  />
+                  <ChatEnvironment
+                    searchQuery={searchQuery}
+                    darkMode={darkMode}
+                    onThemeChange={handleThemeChange}
+                  />
+                </>
+              }
+            />
+            <Route
+              path="/signUp" // Note that the path is all lowercase.
+              element={<SignupPage darkMode={darkMode} />}
+            />
+            <Route
+              path="/login" // Note that the path is all lowercase.
+              element={<LoginPage darkMode={darkMode} />}
+            />
+          </Routes>
+        </div>
+      </Router>
     </ThemeProvider>
   );
 }

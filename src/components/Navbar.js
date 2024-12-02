@@ -10,8 +10,11 @@ import {
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
+import LoginPage from "./LoginPage";
 
 function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
+  const navigate = useNavigate();
   return (
     <AppBar position="static" color="default">
       <Toolbar
@@ -26,7 +29,10 @@ function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
           <IconButton
             edge="start"
             color="inherit"
-            onClick={onBack}
+            onClick={() => {
+              onBack();
+              navigate("/");
+            }}
             sx={{ color: darkMode ? "#fff" : "#000" }}
           >
             <ArrowBackIcon />
@@ -34,7 +40,10 @@ function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
         )}
 
         {/* Title on the left */}
-        <Typography variant="h5" sx={{ fontWeight: "bold", ml: showBackButton ? 2 : 0 }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: "bold", ml: showBackButton ? 2 : 0 }}
+        >
           Yirigaa
         </Typography>
 
@@ -49,10 +58,16 @@ function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
           </IconButton>
 
           {/* Login and Signup buttons */}
-          <Button sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}>
+          <Button
+            sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
+            onClick={() => navigate("/login")}
+          >
             Login
           </Button>
-          <Button sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}>
+          <Button
+            onClick={() => navigate("/signUp")}
+            sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
+          >
             Signup
           </Button>
         </Box>

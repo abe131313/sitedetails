@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, TextField, Typography, IconButton, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ChatEnvironment({ searchQuery, darkMode }) {
   const [messages, setMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const initialMessageAdded = useRef(false);
+
+  const navigate = useNavigate();
 
   // On initial render, add the search query as the first message from the user
   useEffect(() => {
@@ -15,8 +19,18 @@ function ChatEnvironment({ searchQuery, darkMode }) {
     }
   }, [searchQuery]);
 
+  const saveMessageToDB = async (message) => {
+    try {
+      await axios.post("http://localhost:5000/messages/add", message);
+    } catch (error) {
+      console.error("Error saving message to DB", error);
+    }
+  };
+
   const handleSendMessage = (messageText, sender = "user") => {
     if (!messageText.trim()) return;
+
+    const newMessage = { sender, text: messageText };
 
     // Add the message from the user
     setMessages((prevMessages) => [
@@ -24,13 +38,19 @@ function ChatEnvironment({ searchQuery, darkMode }) {
       { sender, text: messageText },
     ]);
 
+    saveMessageToDB(newMessage);
+
     if (sender === "user") {
       // Simulate an AI response after a short delay
       setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: "ai", text: "This is a response from AI (simulated)." },
-        ]);
+        const aiResponse = {
+          sender: "ai",
+          text: "This is a response from AI (simulated).",
+        };
+        setMessages((prevMessages) => [...prevMessages, aiResponse]);
+
+        // Save the AI response to the database
+        saveMessageToDB(aiResponse);
       }, 1000);
 
       setCurrentMessage(""); // Clear input field if it's a user message
