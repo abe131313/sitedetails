@@ -22,7 +22,7 @@ function Navbar({
 }) {
   
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useContext(AppContext);
+  const [ ,setIsLoggedIn ] = useContext(AppContext);
 
   return (
     <AppBar position="static" color="default">
@@ -76,8 +76,8 @@ function Navbar({
                 // Add logout logic here
                 // For example:
                 localStorage.removeItem('token');
+                localStorage.removeItem('user');
                 setIsLoggedIn(false);
-                console.log(logInStatus);
                 navigate("/login");
               }}
               sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
