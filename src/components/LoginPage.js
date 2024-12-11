@@ -1,18 +1,10 @@
-import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  useTheme,
-  CssBaseline,
-  createTheme,
-  ThemeProvider,
-} from "@mui/material";
+import React, { useState, useContext, useEffect } from "react";
+import { Box, TextField, Button } from "@mui/material";
 import TypewriterText from "./TypeWritter";
 import CustomizedSnackbar from "./SnackBar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AppContext } from "../App";
 
 function LoginPage({ onLogin, darkMode }) {
   const navigate = useNavigate();
@@ -22,7 +14,8 @@ function LoginPage({ onLogin, darkMode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("");
-  // const [success, setSuccess] = useState("");
+
+  const [ isLoggedIn,setIsLoggedIn ] = useContext(AppContext);
 
   const handleLogin = async () => {
     try {
@@ -30,7 +23,6 @@ function LoginPage({ onLogin, darkMode }) {
         username,
         password,
       });
-      // setSuccess("login successfull.");
       setMessage("login successful!");
       setSeverity("success");
       setOpen(true);
@@ -39,11 +31,11 @@ function LoginPage({ onLogin, darkMode }) {
       const { user, token } = response.data;
       localStorage.setItem("user", user.username);
       localStorage.setItem("token", token);
+      setIsLoggedIn(true);
 
       // onLogin(user);
     } catch (err) {
       setError("Invalid username or password");
-      // setSuccess("login unsuccessfull.");
       setMessage("login unsuccessful, Please try again with correct details");
       setSeverity("warning");
       setOpen(true);

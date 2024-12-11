@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Box, TextField, Typography, IconButton, Button } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
+import { AppContext } from "../App";
 
 function LoggedInChatInterface({ searchQuery, darkMode }) {
   const [messages, setMessages] = useState([]);
@@ -11,6 +13,7 @@ function LoggedInChatInterface({ searchQuery, darkMode }) {
 
   const navigate = useNavigate();
   const userId = localStorage.getItem("user"); // Get the username from localStorage
+  const [ isLoggedIn, setIsLoggedIn, handleThemeChange, showChat, handleBack] = useContext(AppContext);
 
   // On initial render, add the search query as the first message from the user
   useEffect(() => {
@@ -70,8 +73,8 @@ function LoggedInChatInterface({ searchQuery, darkMode }) {
         setMessages((prevMessages) => [...prevMessages, aiResponse]);
 
         // Save the AI response to the database
-        console.log(({ ...aiResponse, responseToUser:userId }));
-        saveMessageToDB({ ...aiResponse, responseToUser:userId });    
+        console.log({ ...aiResponse, responseToUser: userId });
+        saveMessageToDB({ ...aiResponse, responseToUser: userId });
       }, 1000);
 
       setCurrentMessage(""); // Clear input field if it's a user message
@@ -101,6 +104,13 @@ function LoggedInChatInterface({ searchQuery, darkMode }) {
         backgroundColor: darkMode ? "#121212" : "#f5f5f5",
       }}
     >
+      <Navbar
+        darkMode={darkMode}
+        onThemeChange={handleThemeChange}
+        showBackButton={showChat}
+        onBack={handleBack}
+        logInStatus={isLoggedIn}
+      />
       {/* Message Area */}
       <Box
         sx={{

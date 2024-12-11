@@ -1,4 +1,4 @@
-import React from "react";
+import {React, useContext} from "react";
 import {
   AppBar,
   Box,
@@ -11,10 +11,19 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
-import LoginPage from "./LoginPage";
+import { AppContext } from "../App";
 
-function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
+function Navbar({
+  darkMode,
+  onThemeChange,
+  showBackButton,
+  onBack,
+  logInStatus,
+}) {
+  
   const navigate = useNavigate();
+  const { setIsLoggedIn } = useContext(AppContext);
+
   return (
     <AppBar position="static" color="default">
       <Toolbar
@@ -42,12 +51,15 @@ function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
         {/* Title on the left */}
         <Typography
           variant="h5"
-          sx={{ fontWeight: "bold", ml: showBackButton ? 2 : 0 }}
+          sx={{
+            fontWeight: "bold",
+            ml: showBackButton ? 2 : 0,
+          }}
         >
           Yirigaa
         </Typography>
 
-        {/* Login/Signup options on the right */}
+        {/* Right side content */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* Theme Toggle */}
           <IconButton
@@ -57,19 +69,39 @@ function Navbar({ darkMode, onThemeChange, showBackButton, onBack }) {
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
 
-          {/* Login and Signup buttons */}
-          <Button
-            sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </Button>
-          <Button
-            onClick={() => navigate("/signUp")}
-            sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
-          >
-            Signup
-          </Button>
+          {/* Conditional Rendering based on logInStatus */}
+          {logInStatus ? (
+            <Button
+              onClick={() => {
+                // Add logout logic here
+                // For example:
+                localStorage.removeItem('token');
+                setIsLoggedIn(false);
+                console.log(logInStatus);
+                navigate("/login");
+              }}
+              sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
+            >
+              Logout
+            </Button>
+          ) : (
+            <>
+              <Button
+                sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => navigate("/signUp")}
+                sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}
+              >
+                Signup
+              </Button>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
