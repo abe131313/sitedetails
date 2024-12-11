@@ -1,43 +1,50 @@
+// Import necessary React hooks and Material-UI components
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography } from "@mui/material";
 import CustomizedSnackbar from "./SnackBar";
 import axios from "axios";
 
 function SignupPage({ onSignup, darkMode }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("");
+  // State variables to manage form input and feedback
+  const [username, setUsername] = useState(""); // Store username input
+  const [password, setPassword] = useState(""); // Store password input
+  const [error, setError] = useState(""); // Store error messages (currently commented out)
+  const [success, setSuccess] = useState(""); // Store success messages (currently commented out)
+  const [open, setOpen] = useState(false); // Control Snackbar visibility
+  const [message, setMessage] = useState(""); // Snackbar message
+  const [severity, setSeverity] = useState(""); // Snackbar severity level
 
+  // Handler to open the Snackbar
   const handleSnackbarOpen = () => {
     setOpen(true);
   };
 
+  // Handler to close the Snackbar
   const handleSnackbarClose = () => {
     setOpen(false);
   };
 
+  // Async function to handle signup process
   const handleSignup = async () => {
     try {
+      // Send POST request to signup endpoint
       await axios.post("http://localhost:5000/signup", {
         username,
         password,
       });
+      // Set success message and Snackbar properties on successful signup
       setSuccess("User created successfully. You can now log in.");
-      //   setError("");
       setMessage("Signup successful!");
-      setSeverity("success"); // Set the message for the Snackbar
+      setSeverity("success"); // Set Snackbar to success state
     } catch (err) {
-      //   setError("User creation failed. Try a different username.");
-      setSeverity("warning"); // Set the severity for the Snackbar
-      setMessage("Try another username!"); // Set the message for the Snackbar
+      // Handle signup failure
+      setSeverity("warning"); // Set Snackbar to warning state
+      setMessage("Try another username!"); // Set error message
     }
   };
 
   return (
+    // Outer container with responsive styling and dark/light mode support
     <Box
       sx={{
         width: "100%",
@@ -45,23 +52,24 @@ function SignupPage({ onSignup, darkMode }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: darkMode ? "#121212" : "#f5f5f5",
-        color: darkMode ? "#fff" : "#000",
+        backgroundColor: darkMode ? "#121212" : "#f5f5f5", // Background color based on mode
+        color: darkMode ? "#fff" : "#000", // Text color based on mode
       }}
     >
+      {/* Inner container for signup form */}
       <Box
         sx={{
-          width: { xs: "90%", sm: "400px" },
+          width: { xs: "90%", sm: "400px" }, // Responsive width
           padding: "32px",
           borderRadius: "8px",
           boxShadow: "0px 4px 8px rgba(0,0,0,0.3)",
-          backgroundColor: darkMode ? "#343131" : "#fff",
+          backgroundColor: darkMode ? "#343131" : "#fff", // Background color based on mode
         }}
       >
-        {/* Logo Image */}
+        {/* Logo section */}
         <Box sx={{ marginBottom: "16px" }}>
           <img
-            src={require("../yirigaaLogo.png")} // Path to the image, assuming it is in the public folder
+            src={require("../yirigaaLogo.png")} // Local logo image
             alt="Logo"
             style={{
               width: "100px",
@@ -71,6 +79,8 @@ function SignupPage({ onSignup, darkMode }) {
             }}
           />
         </Box>
+
+        {/* Signup title */}
         <Typography
           variant="h5"
           textAlign="center"
@@ -79,84 +89,76 @@ function SignupPage({ onSignup, darkMode }) {
         >
           Sign up
         </Typography>
-        {/* {error && (
-          <Typography color="error" textAlign="center">
-            {error}
-          </Typography>
-        )}
-        {success && (
-          <Typography color="success.main" textAlign="center">
-            {success}
-          </Typography>
-        )} */}
+
+        {/* Username input field with dark/light mode styling */}
         <TextField
           label="Username"
           variant="outlined"
           fullWidth
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)} // Update username state
           margin="normal"
           sx={{
+            // Custom styling for input field based on dark mode
             "& .MuiOutlinedInput-input": {
-              // Target the input element
-              color: darkMode ? "white" : "#000000", // Set color to white
+              color: darkMode ? "white" : "#000000",
             },
             "& .MuiInputLabel-root": {
-              // Styles for the label
               fontWeight: "bold",
               color: darkMode ? "#FEFBF6" : "#000000",
             },
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                // Styles for focused border
-                borderColor: darkMode ? "transparent" : "transparent",
-                boxShadow: "inset 0 0 5px rgba(0, 0, 0, 0.5)", // Inner shadow effect
-                font: "white",
-              },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: darkMode ? "transparent" : "transparent",
+              boxShadow: "inset 0 0 5px rgba(0, 0, 0, 0.5)",
+              font: "white",
+            },
           }}
         />
+
+        {/* Password input field with similar styling */}
         <TextField
           label="Password"
           variant="outlined"
           fullWidth
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)} // Update password state
           margin="normal"
           sx={{
+            // Same custom styling as username field
             "& .MuiOutlinedInput-input": {
-              // Target the input element
-              color: darkMode ? "white" : "#000000", // Set color to white
+              color: darkMode ? "white" : "#000000",
             },
             "& .MuiInputLabel-root": {
-              // Styles for the label
               fontWeight: "bold",
               color: darkMode ? "#FEFBF6" : "#000000",
             },
-            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-              {
-                // Styles for focused border
-                borderColor: darkMode ? "transparent" : "transparent",
-                boxShadow: "inset 0 0 5px rgba(0, 0, 0, 0.5)", // Inner shadow effect
-                font: "white",
-              },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: darkMode ? "transparent" : "transparent",
+              boxShadow: "inset 0 0 5px rgba(0, 0, 0, 0.5)",
+              font: "white",
+            },
           }}
         />
+
+        {/* Signup button */}
         <Button
           variant="contained"
           fullWidth
           onClick={() => {
-            handleSignup();
-            handleSnackbarOpen();
+            handleSignup(); // Trigger signup process
+            handleSnackbarOpen(); // Open Snackbar
           }}
           style={{
             marginTop: "16px",
-            backgroundColor: "#B17457",
+            backgroundColor: "#B17457", // Custom button color
             color: "#fff",
           }}
         >
           Signup
         </Button>
+
+        {/* Conditionally render Snackbar if there's a message */}
         {message.length > 0 ? (
           <CustomizedSnackbar
             open={open}

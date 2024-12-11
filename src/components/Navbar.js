@@ -1,4 +1,4 @@
-import {React, useContext} from "react";
+import { React, useContext } from "react";
 import {
   AppBar,
   Box,
@@ -14,33 +14,37 @@ import { useNavigate } from "react-router-dom";
 import { AppContext } from "../App";
 
 function Navbar({
-  darkMode,
-  onThemeChange,
-  showBackButton,
-  onBack,
-  logInStatus,
+  darkMode,           // Boolean to determine current theme mode
+  onThemeChange,      // Function to toggle between light and dark modes
+  showBackButton,     // Boolean to conditionally render back button
+  onBack,             // Function to handle back navigation logic
+  logInStatus,        // Boolean to determine if user is logged in
 }) {
-  
+  // Hook for programmatic navigation
   const navigate = useNavigate();
+
+  // Destructure context to access and update login status
   const [ ,setIsLoggedIn ] = useContext(AppContext);
 
   return (
+    // Main App Bar component with default color and static positioning
     <AppBar position="static" color="default">
       <Toolbar
         sx={{
+          // Dynamic background and text color based on dark mode
           backgroundColor: darkMode ? "#121212" : "#f5f5f5",
           color: darkMode ? "#fff" : "#000",
-          justifyContent: "space-between",
+          justifyContent: "space-between", // Distribute space evenly
         }}
       >
-        {/* Back Button */}
+        {/* Conditionally render back button if showBackButton is true */}
         {showBackButton && (
           <IconButton
             edge="start"
             color="inherit"
             onClick={() => {
-              onBack();
-              navigate("/");
+              onBack();           // Execute custom back logic
+              navigate("/");      // Navigate to home page
             }}
             sx={{ color: darkMode ? "#fff" : "#000" }}
           >
@@ -48,33 +52,35 @@ function Navbar({
           </IconButton>
         )}
 
-        {/* Title on the left */}
+        {/* App Title */}
         <Typography
           variant="h5"
           sx={{
             fontWeight: "bold",
+            // Add left margin if back button is shown
             ml: showBackButton ? 2 : 0,
           }}
         >
           Yirigaa
         </Typography>
 
-        {/* Right side content */}
+        {/* Container for right-side navigation items */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Theme Toggle */}
+          {/* Theme toggle button */}
           <IconButton
             onClick={onThemeChange}
             sx={{ color: darkMode ? "#fff" : "#000" }}
           >
+            {/* Conditionally render sun or moon icon based on dark mode */}
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
 
-          {/* Conditional Rendering based on logInStatus */}
+          {/* Conditional rendering based on login status */}
           {logInStatus ? (
+            // Render logout button when user is logged in
             <Button
               onClick={() => {
-                // Add logout logic here
-                // For example:
+                // Logout logic: clear local storage and update login status
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 setIsLoggedIn(false);
@@ -85,6 +91,7 @@ function Navbar({
               Logout
             </Button>
           ) : (
+            // Render login and signup buttons when user is not logged in
             <>
               <Button
                 sx={{ ml: 2, color: darkMode ? "#fff" : "#000" }}

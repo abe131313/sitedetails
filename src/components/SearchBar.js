@@ -27,78 +27,77 @@ import { loadFireflyPreset } from "tsparticles-preset-firefly";
 import { useNavigate } from "react-router-dom";
 
 function SearchBar({ onSearch, darkMode }) {
+  // State to manage the search query input
   const [searchQuery, setSearchQuery] = useState("");
+  // State to store search suggestions
   const [suggestions, setSuggestions] = useState([]);
+  // State to track the active tab
   const [tabIndex, setTabIndex] = useState(0);
+  // State to track focus state of the search bar
   const [isFocused, setIsFocused] = useState(false);
 
   const navigate = useNavigate();
 
-  // Create a debounced function using useCallback so it remains stable between renders
+  // Debounce the fetchSuggestions function to limit API calls
   const debouncedFetchSuggestions = useCallback(
     debounce(async (query) => {
       if (query.length < 2) {
+        // If the query length is less than 2, reset suggestions
         setSuggestions([]);
         return;
       }
 
       try {
+        // Fetch suggestions from the server
         const response = await axios.get(`http://localhost:5000/suggest`, {
           params: { query },
         });
-        console.log("in fetchSuggestions functions try block");
-        console.log(response.data);
-        setSuggestions(response.data);
+        console.log("Fetched suggestions:", response.data);
+        setSuggestions(response.data); // Update state with the fetched suggestions
       } catch (error) {
-        console.error("Error fetching suggestions", error);
+        console.error("Error fetching suggestions", error); // Log any error
       }
-    }, 500), // Adjust debounce time as necessary
+    }, 500), // Debounce interval
     []
   );
 
-  // Handle text input changes
+  // Handle input changes and trigger the debounced API call
   const handleInputChange = (event) => {
     const query = event.target.value;
-    setSearchQuery(query);
-    debouncedFetchSuggestions(query);
+    setSearchQuery(query); // Update the search query state
+    debouncedFetchSuggestions(query); // Fetch suggestions for the current query
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
+  const handleFocus = () => setIsFocused(true); // Handle input focus
+  const handleBlur = () => setIsFocused(false); // Handle input blur
 
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
-  // Handle clicking on a suggestion
+  // Add a suggestion to the search input and clear the list
   const handleSuggestionClick = (suggestion) => {
-    setSearchQuery(suggestion);
-    setSuggestions([]);
-    onSearch(suggestion);
+    setSearchQuery(suggestion); // Set the clicked suggestion as the search query
+    setSuggestions([]); // Clear suggestions
+    onSearch(suggestion); // Trigger the search
   };
 
-  // Handle pressing the Enter key
+  // Handle Enter key press for search
   const handleKeyPress = async (event) => {
     if (event.key === "Enter") {
-      onSearch(searchQuery);
-      console.log("handleKeyPress function executed");
-      setSuggestions([]); // Clear suggestions after search
+      onSearch(searchQuery); // Perform the search
+      setSuggestions([]); // Clear suggestions
       try {
+        // Send the search query to the server for logging
         await axios.post(`http://localhost:5000/search`, {
           query: searchQuery,
         });
       } catch (error) {
-        console.error("Problem saving the suggestions", error);
+        console.error("Error saving the search", error);
       }
     }
   };
 
   // Handle tab change
-  const handleTabChange = (event, newIndex) => {
-    setTabIndex(newIndex);
-  };
+  const handleTabChange = (event, newIndex) => setTabIndex(newIndex);
 
+  // Styled Paper component for the tab content
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: "#fff",
     ...theme.typography.body2,
@@ -106,24 +105,23 @@ function SearchBar({ onSearch, darkMode }) {
     textAlign: "center",
     color: theme.palette.text.secondary,
     ...(darkMode && {
-      backgroundColor: "#1A2027",
+      backgroundColor: "#1A2027", // Adjust background color for dark mode
       color: "#fff",
     }),
   }));
 
-  // Load particles with the Firefly preset
-  const particlesInit = async (main) => {
-    await loadFireflyPreset(main);
-  };
+  // Initialize the particles effect with the Firefly preset
+  const particlesInit = async (main) => await loadFireflyPreset(main);
 
+  // Options for the Firefly particle effect
   const particlesOptions = {
     preset: "firefly",
     background: {
-      color: darkMode ? "#000000" : "#ffffff",
+      color: darkMode ? "#000000" : "#ffffff", // Match background with dark mode
     },
   };
 
-  // Define the keyframes animation
+  // Define a simple keyframes animation for the search button
   const slideAnimation = keyframes`
     0%, 100% {
       transform: translateX(0);
@@ -135,7 +133,7 @@ function SearchBar({ onSearch, darkMode }) {
 
   return (
     <Box sx={{ position: "relative", overflow: "hidden" }}>
-      {/* Firefly Background */}
+      {/* Firefly Background Effect */}
       <Particles
         id="tsparticles"
         init={particlesInit}
@@ -146,7 +144,7 @@ function SearchBar({ onSearch, darkMode }) {
           left: 0,
           width: "100%",
           height: "100%",
-          zIndex: -1,
+          zIndex: -1, // Place behind the main content
         }}
       />
       <Box
@@ -155,19 +153,16 @@ function SearchBar({ onSearch, darkMode }) {
           height: "85vh",
           padding: "16px",
           boxSizing: "border-box",
-          position: "relative",
-          left: "0",
-          marginLeft: "0",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center", // Align everything to the center
+          justifyContent: "center", // Center align the content
         }}
       >
         {/* Search Bar Section */}
         <Box
           sx={{
-            width: "100%", // Make sure the search bar matches the parent's width
+            width: "100%",
             maxWidth: "750px",
             marginBottom: "16px",
             position: "relative",
@@ -184,8 +179,8 @@ function SearchBar({ onSearch, darkMode }) {
                 <InputAdornment position="end">
                   <IconButton
                     onClick={() => {
-                      onSearch(searchQuery);
-                      navigate("/chat");
+                      onSearch(searchQuery); // Trigger search on click
+                      navigate("/chat"); // Navigate to chat page
                     }}
                   >
                     <ArrowForwardIcon
@@ -193,7 +188,7 @@ function SearchBar({ onSearch, darkMode }) {
                         color: darkMode ? "white" : "black",
                         animation: isFocused
                           ? `${slideAnimation} 1s ease-in-out infinite`
-                          : "none",
+                          : "none", // Apply animation on focus
                       }}
                     />
                   </IconButton>
@@ -208,15 +203,9 @@ function SearchBar({ onSearch, darkMode }) {
             fullWidth
             sx={{
               "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "transparent", // Default border color
-                },
-                "&:hover fieldset": {
-                  borderColor: "transparent", // Border color on hover
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "transparent", // Border color when focused
-                },
+                "& fieldset": { borderColor: "transparent" },
+                "&:hover fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "transparent" },
               },
             }}
           />
@@ -238,13 +227,11 @@ function SearchBar({ onSearch, darkMode }) {
                   width: "100%",
                   bgcolor: darkMode
                     ? "rgba(26, 32, 39, 0.6)"
-                    : "rgba(255, 255, 255, 0.6)", // Slightly transparent background
+                    : "rgba(255, 255, 255, 0.6)",
                   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
                   borderRadius: "4px",
                   zIndex: 10,
                   backdropFilter: "blur(5px)", // Frosted glass effect
-                  WebkitBackdropFilter: "blur(10px)", // Frosted glass effect for Safari
-                  border: "0px solid rgba(255, 255, 255, 0.2)", // Light border to enhance effect
                 }}
               >
                 {suggestions.map((suggestion, index) => (
@@ -255,8 +242,8 @@ function SearchBar({ onSearch, darkMode }) {
                     sx={{
                       bgcolor: darkMode
                         ? "rgba(26, 32, 39, 0.8)"
-                        : "rgba(255, 255, 255, 0.8)", // Background for list items
-                      margin: "1px 0", // Spacing between items
+                        : "rgba(255, 255, 255, 0.8)",
+                      margin: "1px 0",
                       borderRadius: "10px",
                     }}
                   >
@@ -284,8 +271,7 @@ function SearchBar({ onSearch, darkMode }) {
             textColor="inherit"
             indicatorColor="primary"
             sx={{
-              backgroundColor: darkMode ? "#rgba(26, 32, 39, 0.6)" : "#e0e0e0",
-              color: darkMode ? "#fff" : "#000",
+              backgroundColor: darkMode ? "rgba(26, 32, 39, 0.6)" : "#e0e0e0",
               borderRadius: "8px",
             }}
           >
@@ -304,27 +290,11 @@ function SearchBar({ onSearch, darkMode }) {
             backgroundColor: darkMode ? "#1A2027" : "#fff",
             color: darkMode ? "#fff" : "#000",
             borderRadius: "8px",
-            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
-          {tabIndex === 0 && (
-            <Typography variant="body1">
-              This is some content for Tab 1. You can add any text or elements
-              you want here.
-            </Typography>
-          )}
-          {tabIndex === 1 && (
-            <Typography variant="body1">
-              This is content for Tab 2. You can customize this with any
-              information you'd like to display.
-            </Typography>
-          )}
-          {tabIndex === 2 && (
-            <Typography variant="body1">
-              Here is the content for Tab 3. Feel free to modify this to suit
-              your needs.
-            </Typography>
-          )}
+          {tabIndex === 0 && <Typography>This is some content for Tab 1.</Typography>}
+          {tabIndex === 1 && <Typography>This is content for Tab 2.</Typography>}
+          {tabIndex === 2 && <Typography>Here is the content for Tab 3.</Typography>}
         </Box>
       </Box>
     </Box>
