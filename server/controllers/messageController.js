@@ -2,7 +2,7 @@
 const Message = require("../models/messageModel.js");
 
 const addMessage = async (req, res) => {
-  const { sender, text } = req.body;
+  const { sender, text, responseToUser } = req.body;
 
   try {
     const newMessage = await Message.create({ sender, text });
@@ -11,5 +11,7 @@ const addMessage = async (req, res) => {
     res.status(500).json({ error: "Server Error" });
   }
 };
+
+
 
 module.exports = { addMessage };

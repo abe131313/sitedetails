@@ -12,8 +12,10 @@ import {
 import TypewriterText from "./TypeWritter";
 import CustomizedSnackbar from "./SnackBar";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage({ onLogin, darkMode }) {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -32,10 +34,12 @@ function LoginPage({ onLogin, darkMode }) {
       setMessage("login successful!");
       setSeverity("success");
       setOpen(true);
+      navigate("/loggedInChat");
       // Assuming the backend returns a user object and a token
       const { user, token } = response.data;
       localStorage.setItem("user", user.username);
       localStorage.setItem("token", token);
+
       // onLogin(user);
     } catch (err) {
       setError("Invalid username or password");

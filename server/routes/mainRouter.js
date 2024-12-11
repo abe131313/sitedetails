@@ -6,13 +6,16 @@ const { getSearchSuggestions, searchQuery } = require('../controllers/searchHist
 const {addMessage} = require('../controllers/messageController.js')
 const {signUp} = require('../controllers/signUpController.js')
 const {loginController} = require("../controllers/loginController.js")
+const {addMessages, getMessages} = require("../controllers/loggedInChatController.js")
 
 router.use('/scrape', scrapeRouter);
 router.get('/suggest', getSearchSuggestions); // Get search suggestions
 router.post('/search', searchQuery); // Save a search term
 router.post('/messages/add', addMessage); // save chat history to the DB
+router.post('/messages/login-add', addMessages); 
+router.get('/messages/:userId', getMessages);
 router.post('/signup', signUp);
-router.post('/login', loginController); 
+router.post('/login', loginController);
 
 
 module.exports = router;

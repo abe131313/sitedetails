@@ -1,190 +1,197 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  List, 
-  ListItem, 
-  ListItemAvatar, 
-  ListItemText, 
-  Avatar, 
-  Paper, 
-  IconButton, 
-  InputBase, 
-  Divider, 
-  ThemeProvider, 
-  createTheme, 
-  CssBaseline 
-} from '@mui/material';
-import { 
-  Send as SendIcon, 
-  Search as SearchIcon 
-} from '@mui/icons-material';
+import React, { useState, useEffect, useRef } from "react";
+import { Box, TextField, Typography, IconButton, Button } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const ChatInterface = (darkMode = false) => {
-  // State management
+function LoggedInChatInterface({ searchQuery, darkMode }) {
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      lastMessage: 'Hey, how are you?',
-      avatar: '/path/to/avatar1.jpg'
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      lastMessage: 'Meeting at 2 PM',
-      avatar: '/path/to/avatar2.jpg'
-    }
-  ]);
+  const [currentMessage, setCurrentMessage] = useState("");
+  const initialMessageAdded = useRef(false);
 
-  // Theme creation
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? 'dark' : 'light',
-    }
-  });
+  const navigate = useNavigate();
+  const userId = localStorage.getItem("user"); // Get the username from localStorage
 
-  // Message sending handler
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      setMessages([
-        ...messages, 
-        { 
-          id: messages.length + 1, 
-          text: inputMessage, 
-          sender: 'me' 
-        }
-      ]);
-      setInputMessage('');
+  // On initial render, add the search query as the first message from the user
+  useEffect(() => {
+    if (searchQuery && !initialMessageAdded.current) {
+      handleSendMessage(searchQuery, userId);
+      initialMessageAdded.current = true; // Mark that the initial message has been added
+    }
+  }, [searchQuery]);
+
+  // Fetch chat history from the database for the logged-in user
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/messages/${userId}`
+        );
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Error fetching chat history", error);
+      }
+    };
+
+    if (userId) {
+      fetchChatHistory();
+    }
+  }, [userId]);
+
+  // Save a message to the database
+  const saveMessageToDB = async (message) => {
+    console.log(message);
+    try {
+      await axios.post("http://localhost:5000/messages/login-add", message);
+    } catch (error) {
+      console.error("Error saving message to DB", error);
+    }
+  };
+
+  // Handle sending a message
+  const handleSendMessage = (messageText, sender = userId) => {
+    if (!messageText.trim()) return;
+
+    const newMessage = { sender, text: messageText };
+
+    // Add the message to the local state
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+    // Save the message to the database
+    saveMessageToDB({ ...newMessage, userId });
+
+    if (sender === userId) {
+      // Simulate an AI response after a short delay
+      setTimeout(() => {
+        const aiResponse = {
+          sender: "ai",
+          text: "This is a response from AI (simulated).",
+        };
+        setMessages((prevMessages) => [...prevMessages, aiResponse]);
+
+        // Save the AI response to the database
+        console.log(({ ...aiResponse, responseToUser:userId }));
+        saveMessageToDB({ ...aiResponse, responseToUser:userId });    
+      }, 1000);
+
+      setCurrentMessage(""); // Clear input field if it's a user message
+    }
+  };
+
+  // Handle input change
+  const handleInputChange = (event) => {
+    setCurrentMessage(event.target.value);
+  };
+
+  // Handle pressing the Enter key to send a message
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      //   event.preventDefault();
+      handleSendMessage(currentMessage);
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          height: '100vh', 
-          border: '1px solid', 
-          borderColor: 'divider' 
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "90vh",
+        overflow: "hidden",
+        backgroundColor: darkMode ? "#121212" : "#f5f5f5",
+      }}
+    >
+      {/* Message Area */}
+      <Box
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "8px",
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "calc(100vh - 64px)", // Adjusting to fit without scrolling
         }}
       >
-        {/* Chat History Panel */}
-        <Box 
-          sx={{ 
-            width: '300px', 
-            borderRight: '1px solid', 
-            borderColor: 'divider', 
-            overflowY: 'auto' 
-          }}
-        >
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              p: 2, 
-              fontWeight: 'bold' 
+        {messages.map((msg, index) => (
+          <Box
+            key={index}
+            sx={{
+              alignSelf: msg.sender === userId ? "flex-end" : "flex-start",
+              backgroundColor: msg.sender === userId ? "#1976d2" : "#e0e0e0",
+              color: msg.sender === userId ? "#fff" : "#000",
+              padding: "8px 16px",
+              borderRadius: "12px",
+              marginBottom: "8px",
+              maxWidth: "60%",
             }}
           >
-            Chats
-          </Typography>
-          <List>
-            {chatHistory.map((chat) => (
-              <ListItem key={chat.id} button>
-                <ListItemAvatar>
-                  <Avatar src={chat.avatar} />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={chat.name}
-                  secondary={chat.lastMessage}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-
-        {/* Chat Area */}
-        <Box 
-          sx={{ 
-            flexGrow: 1, 
-            display: 'flex', 
-            flexDirection: 'column' 
-          }}
-        >
-          {/* Messages Display Area */}
-          <Box 
-            sx={{ 
-              flexGrow: 1, 
-              overflowY: 'auto', 
-              p: 2 
-            }}
-          >
-            {messages.map((msg) => (
-              <Box 
-                key={msg.id} 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: msg.sender === 'me' ? 'flex-end' : 'flex-start',
-                  mb: 2 
-                }}
-              >
-                <Paper 
-                  sx={{ 
-                    p: 1.5, 
-                    maxWidth: '60%', 
-                    backgroundColor: msg.sender === 'me' 
-                      ? (darkMode ? '#2e7d32' : '#e8f5e9') 
-                      : (darkMode ? '#1565c0' : '#e3f2fd') 
-                  }}
-                >
-                  <Typography variant="body2">
-                    {msg.text}
-                  </Typography>
-                </Paper>
-              </Box>
-            ))}
+            <Typography variant="body1">{msg.text}</Typography>
           </Box>
-
-          {/* Message Input Area */}
-          <Box 
-            sx={{ 
-              p: 2, 
-              borderTop: '1px solid', 
-              borderColor: 'divider' 
-            }}
-          >
-            <Paper
-              component="form"
-              sx={{ 
-                p: '2px 4px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                width: '100%' 
-              }}
-            >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Type a message"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-              <IconButton 
-                color="primary" 
-                sx={{ p: '10px' }} 
-                onClick={handleSendMessage}
-              >
-                <SendIcon />
-              </IconButton>
-            </Paper>
-          </Box>
-        </Box>
+        ))}
       </Box>
-    </ThemeProvider>
-  );
-};
 
-export default ChatInterface;
+      {/* Input Area */}
+      <Box
+        sx={{
+          display: "flex",
+          padding: "8px",
+          backgroundColor: darkMode ? "#121212" : "#f5f5f5",
+          boxSizing: "border-box",
+          flexShrink: 0,
+          width: "100%",
+        }}
+      >
+        <TextField
+          value={currentMessage}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          placeholder="Type your message..."
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={1}
+          maxRows={2}
+          sx={{
+            flex: 1,
+            marginRight: "8px",
+            "& .MuiInputBase-root": {
+              color: darkMode ? "#fff" : "#000", // Changes input text color
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: darkMode ? "#fff" : "#000",
+              },
+              "&:hover fieldset": {
+                borderColor: darkMode ? "#fff" : "#000",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: darkMode ? "#fff" : "#000",
+              },
+            },
+            "&::placeholder": {
+              color: darkMode ? "#fff" : "#000",
+            },
+          }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleSendMessage(currentMessage)}
+          endIcon={<SendIcon />}
+          sx={{
+            backgroundColor: darkMode ? "#1d1d1d" : "#e0e0e0",
+            color: darkMode ? "#fff" : "#000",
+            "&:hover": {
+              backgroundColor: darkMode ? "#333" : "#ccc",
+              color: darkMode ? "#fff" : "#000",
+            },
+          }}
+        >
+          Send
+        </Button>
+      </Box>
+    </Box>
+  );
+}
+
+export default LoggedInChatInterface;
